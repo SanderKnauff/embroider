@@ -23,6 +23,9 @@ module.exports = function (defaults) {
           configFromMacrosTests: 'exists',
           shouldBeOverwritten: 'overwritten',
         },
+        'v2-sample-addon-macro': {
+          showGreen: true
+        },
       },
     },
   });

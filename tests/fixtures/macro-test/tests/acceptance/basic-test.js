@@ -41,6 +41,23 @@ module('Acceptance | smoke tests', function (hooks) {
     assert.equal(this.element.querySelector('[data-test-macro-condition]').textContent.trim(), 'red');
   })
 
+  test('Gjs component macroCondition with getOwnConfig worked', async function (assert) {
+    await visit('/');
+    assert.equal(currentURL(), '/');
+    assert.equal(this.element.querySelector('[data-test-macro-condition-in-gjs-component]').textContent.trim(), 'red');
+  })
+
+  test('V2 Gjs component macroCondition with getOwnConfig worked', async function (assert) {
+    await visit('/');
+    assert.equal(currentURL(), '/');
+    assert.equal(this.element.querySelector('[data-test-v2-macro-condition-in-gjs-component]').textContent.trim(), 'green');
+  })
+
+  test('getConfig for addon dependency worked', async function (assert) {
+    await visit('/');
+    assert.equal(currentURL(), '/');
+    assert.equal(this.element.querySelector('[data-test-get-config-for-dependency]').textContent.trim(), 'true');
+  })
 
   // TODO: this tests app.import custom outputPath support. It's unclear whether
   // we want to keep that feature, and regardless this test suite was a bad

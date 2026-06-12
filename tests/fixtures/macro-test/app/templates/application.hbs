@@ -5,8 +5,11 @@
 <div data-test-version>{{this.versionChangerVersion}}</div>
 <div data-test-macro-condition>
   {{#if (macroCondition (macroGetOwnConfig 'showRed'))}}
-    red
+  red
   {{else}}
-    blue
+  blue
   {{/if}}
 </div>
+<MacroReproduction />
+<V2ComponentWithMacro />
+<div data-test-get-config-for-dependency>{{this.showGreenForAddon}}</div>

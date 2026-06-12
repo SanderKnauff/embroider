@@ -1,5 +1,6 @@
-import { appScenarios, dummyAppScenarios, baseAddon, tsAppClassicScenarios, isUsingQunit9 } from './scenarios';
-import type { PreparedApp, Project } from 'scenario-tester';
+import path from 'path';
+import { appScenarios, dummyAppScenarios, baseAddon, baseV2Addon, tsAppClassicScenarios, isUsingQunit9 } from './scenarios';
+import { PreparedApp, Project } from 'scenario-tester';
 import QUnit from 'qunit';
 import merge from 'lodash/merge';
 import { join } from 'path';
@@ -20,12 +21,15 @@ function updateVersionChanger(app: PreparedApp, version: string) {
 
 function scenarioSetup(project: Project) {
   let macroSampleAddon = baseAddon();
+  let macroSampleV2Addon = baseV2Addon();
   let funkySampleAddon = baseAddon();
 
   macroSampleAddon.pkg.name = 'macro-sample-addon';
+  macroSampleV2Addon.pkg.name = 'v2-sample-addon-macro';
   funkySampleAddon.pkg.name = '@embroider/funky-sample-addon';
 
   merge(macroSampleAddon.files, loadFromFixtureData('macro-sample-addon'));
+  merge(macroSampleV2Addon.files, loadFromFixtureData('v2-sample-addon-macro'));
   merge(funkySampleAddon.files, loadFromFixtureData('funky-sample-addon'));
   merge(project.files, loadFromFixtureData('macro-test'));
 
@@ -33,11 +37,32 @@ function scenarioSetup(project: Project) {
   funkySampleAddon.linkDependency('broccoli-funnel', { baseDir: __dirname });
   funkySampleAddon.linkDependency('@embroider/macros', { baseDir: __dirname });
   macroSampleAddon.linkDependency('@embroider/macros', { baseDir: __dirname });
+  macroSampleV2Addon.linkDependency('@embroider/macros', { baseDir: __dirname });
+  macroSampleV2Addon.linkDependency('@embroider/addon-shim', { baseDir: __dirname });
+  macroSampleV2Addon.linkDependency('@embroider/addon-dev', { baseDir: __dirname });
+  macroSampleV2Addon.linkDependency('babel-plugin-ember-template-compilation', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('@babel/core', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('@babel/plugin-transform-class-static-block', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('@babel/plugin-transform-class-properties', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('@babel/plugin-proposal-decorators', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('@rollup/plugin-babel', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('rollup', { baseDir: __dirname });
   project.linkDevDependency('@embroider/macros', { baseDir: __dirname });
   project.addDevDependency('version-changer', '4.0.0');
   project.linkDevDependency('webpack', { baseDir: __dirname });
 
+  macroSampleV2Addon.pkg.files = ['dist'];
+  macroSampleV2Addon.pkg.exports = {
+    './*': './dist/*.js',
+    './addon-main.js': './addon-main.js',
+    './package.json': './package.json',
+  };
+  macroSampleV2Addon.pkg.scripts = {
+    build: 'node ./node_modules/rollup/dist/bin/rollup -c ./rollup.config.mjs',
+  };
+
   project.addDevDependency(macroSampleAddon);
+  project.addDevDependency(macroSampleV2Addon);
   project.addDevDependency(funkySampleAddon);
 
   project.addDependency('cjs-example-lib', {
@@ -85,6 +110,11 @@ appScenarios
 
       hooks.before(async () => {
         app = await scenario.prepare();
+
+        let result = await inDependency(app, 'v2-sample-addon-macro').execute('pnpm build');
+        if (result.exitCode !== 0) {
+          throw new Error(result.output);
+        }
       });
 
       test(`pnpm test`, async function (assert) {
@@ -478,3 +508,8 @@ tsAppClassicScenarios
       });
     });
   });
+
+// https://github.com/ef4/scenario-tester/issues/5
+function inDependency(app: PreparedApp, dependencyName: string): PreparedApp {
+  return new PreparedApp(path.dirname(require.resolve(`${dependencyName}/package.json`, { paths: [app.dir] })));
+}
