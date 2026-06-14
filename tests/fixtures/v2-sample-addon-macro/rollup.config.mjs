@@ -29,6 +29,7 @@ export default {
       configFile: babelConfig,
     }),
 
+    addon.hbs(),
     addon.gjs(),
 
     addon.clean(),
