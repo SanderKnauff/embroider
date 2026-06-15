@@ -37,7 +37,6 @@ function scenarioSetup(project: Project) {
   funkySampleAddon.linkDependency('broccoli-funnel', { baseDir: __dirname });
   funkySampleAddon.linkDependency('@embroider/macros', { baseDir: __dirname });
   macroSampleAddon.linkDependency('@embroider/macros', { baseDir: __dirname });
-  macroSampleV2Addon.linkDependency('@embroider/macros', { baseDir: __dirname });
   macroSampleV2Addon.linkDependency('@embroider/addon-shim', { baseDir: __dirname });
   macroSampleV2Addon.linkDependency('@embroider/addon-dev', { baseDir: __dirname });
   macroSampleV2Addon.linkDependency('babel-plugin-ember-template-compilation', { baseDir: __dirname });
@@ -45,6 +44,7 @@ function scenarioSetup(project: Project) {
   macroSampleV2Addon.linkDevDependency('@babel/plugin-transform-class-static-block', { baseDir: __dirname });
   macroSampleV2Addon.linkDevDependency('@babel/plugin-transform-class-properties', { baseDir: __dirname });
   macroSampleV2Addon.linkDevDependency('@babel/plugin-proposal-decorators', { baseDir: __dirname });
+  macroSampleV2Addon.linkDevDependency('@embroider/macros', { baseDir: __dirname });
   macroSampleV2Addon.linkDevDependency('@rollup/plugin-babel', { baseDir: __dirname });
   macroSampleV2Addon.linkDevDependency('rollup', { baseDir: __dirname });
   project.linkDevDependency('@embroider/macros', { baseDir: __dirname });
